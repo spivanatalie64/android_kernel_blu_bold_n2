@@ -1,0 +1,1 @@
+Linux version 4.14.186 (nobody@android-build) #2 SMP PREEMPT Wed Sep 14 22:57:41 CST 2022

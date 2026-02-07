@@ -1,0 +1,27 @@
+# BLU Bold N2 Kernel Configuration
+# Device: BLU Bold N2 (bold_n2)
+# SoC: MediaTek Dimensity 810 (MT6833)
+# Kernel: Linux 4.14.186
+#
+# This is a placeholder defconfig. 
+# The actual kernel config needs to be extracted from the stock kernel
+# or obtained from MediaTek kernel source.
+#
+# To extract config (if available):
+#   scripts/extract-ikconfig vmlinux > .config
+#   make savedefconfig
+#   mv defconfig arch/arm64/configs/bold_n2_defconfig
+
+CONFIG_ARM64=y
+CONFIG_ARCH_MEDIATEK=y
+
+# Basic kernel features
+CONFIG_64BIT=y
+CONFIG_SMP=y
+CONFIG_NR_CPUS=8
+
+# MediaTek MT6833 specific
+# Add actual MT6833 configs here when available
+
+# Placeholder - replace with actual configuration
+# extracted from stock kernel or MediaTek source

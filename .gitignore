@@ -1,0 +1,40 @@
+# Kernel build artifacts
+*.o
+*.ko
+*.cmd
+*.d
+*.symvers
+*.order
+*.mod.c
+.tmp_versions/
+modules.builtin
+
+# Build directories
+arch/*/boot/
+.config
+.config.old
+vmlinux
+System.map
+Module.symvers
+
+# Compiled binaries
+Image
+Image.gz
+zImage
+*.dtb
+*.dtbo
+
+# Editor files
+*~
+*.swp
+*.swo
+.*.swp
+.*.swo
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+Attempted to extract kernel config from:
+ - extracted/kernel/vmlinux
+ - android_device_blu_bold_n2/prebuilt-kernel/Image.gz
+
+Methods tried:
+ - Searched for IKCONFIG marker in vmlinux and Image.gz: not found
+ - Scanned for gzip-compressed blobs and attempted decompression: no candidate with >50 CONFIG_ lines found
+ - Searched for plain-text CONFIG_ lines via strings: none found
+
+Result: No embedded kernel .config could be extracted from the provided prebuilt kernel artifacts.
+
+Next steps:
+ - If you have the original kernel build artifacts (vmlinux or zImage with IKCONFIG enabled) provide them.
+ - Alternatively provide the kernel source used to build this prebuilt kernel or a saved .config from that build.
