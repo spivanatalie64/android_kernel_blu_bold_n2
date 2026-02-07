@@ -1,8 +1,0 @@
-# bold_n2_defconfig
-# Placeholder defconfig created because no embedded config was found in the prebuilt kernel.
-# Kernel version: 4.14.186
-# Please replace this file with the .config extracted from the original kernel build or a proper defconfig.
-
-CONFIG_ARM64=y
-CONFIG_64BIT=y
-# End placeholder

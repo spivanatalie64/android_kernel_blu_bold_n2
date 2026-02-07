@@ -1,163 +1,176 @@
 # Kernel for BLU Bold N2
 
+This repository contains the kernel configuration and documentation for the BLU Bold N2 (bold_n2) device running LineageOS.
+
 ## Device Information
 
 - **Device**: BLU Bold N2
 - **Codename**: bold_n2
 - **SoC**: MediaTek Dimensity 810 (MT6833)
+- **Architecture**: ARM64 (aarch64)
 - **Kernel Version**: Linux 4.14.186
-- **Architecture**: ARM64
+- **Build Date**: Sep 14 2022
 
-## Current Status
+## Current Status: Prebuilt Kernel
 
-This repository contains kernel configuration and documentation for building the kernel.
+The device currently uses a **prebuilt kernel** extracted from stock firmware located in the device tree:
 
-Currently, the device tree uses a **prebuilt kernel** extracted from stock firmware located at:
-`device/blu/bold_n2/prebuilt-kernel/`
-
-## Prebuilt Kernel Information
-
-**Source**: Extracted from stock firmware BOLD_N0050UU_V11.0.04.04_GENERIC_20220914_2257
-
-- **Image.gz**: Compressed kernel image (~13MB)
-- **dtb.img**: Device Tree Blob
-- **dtbo.img**: Device Tree Blob Overlay
-
-### Kernel Build Information
-- Version: Linux 4.14.186
-- Build Date: September 2022
-- Compiler: Unknown (extracted binary)
-- Config: Not embedded (IKCONFIG not enabled)
-
-## Building from Source
-
-To build the kernel from source, you'll need:
-
-### 1. Obtain Kernel Source
-
-Option A: Extract from vmlinux (if available)
-```bash
-# Decompile vmlinux to get source hints
-# This requires significant reverse engineering
+```
+device/blu/bold_n2/prebuilt-kernel/
+├── Image.gz      # Compressed kernel image
+├── dtb.img       # Device tree blob
+└── dtbo.img      # Device tree overlay
 ```
 
-Option B: Use MediaTek kernel source
-```bash
-# MediaTek may provide kernel source
-# Check MediaTek developer portal
+## Kernel Configuration
+
+The **actual kernel configuration has been successfully extracted** from the stock firmware's vmlinux and is available at:
+
+```
+arch/arm64/configs/bold_n2_defconfig
 ```
 
-### 2. Kernel Configuration
+This is the **complete, real configuration** (5512 lines) used to build the stock kernel, extracted using the `extract-ikconfig` tool from the unstripped vmlinux binary.
 
-A placeholder defconfig has been created at:
-`arch/arm64/configs/bold_n2_defconfig`
+### Key Configuration Highlights
 
-This is a starting point and needs to be populated with actual configuration.
+- **Platform**: `CONFIG_MACH_MT6833=y`
+- **MTK Platform ID**: `CONFIG_MTK_PLATFORM="mt6853"` (kernel platform name)
+- **Project**: `CONFIG_ARCH_MTK_PROJECT="k6833v1_64"`
+- **Compiler**: Android clang 11.0.1
+- **Cross Compile**: `aarch64-linux-android-`
 
-### 3. Build Instructions
+### MediaTek-Specific Features Enabled
 
-Once you have the kernel source:
+- MTK CPU frequency scaling
+- MTK power management (PTPOD, CPU_MSSV, SLBC)
+- MTK thermal management
+- MTK QoS framework v2
+- MT6359P PMIC support
+- MT6360 PMU (charger, power management)
+- MTK display (DRM_MEDIATEK)
+- MTK audio (SND_SOC_MT6833)
+- MTK video codec (VCODEC, JPEG, VCU)
+- MTK security (DEVAPC, DEVMPU)
+- MTK low power modes
+
+## Building from Source (Future)
+
+### Prerequisites
+
+```bash
+# Install toolchain
+sudo apt install gcc-aarch64-linux-gnu build-essential bc bison flex libssl-dev
+```
+
+### When Kernel Source Becomes Available
 
 ```bash
 export ARCH=arm64
-export CROSS_COMPILE=aarch64-linux-android-
+export CROSS_COMPILE=aarch64-linux-gnu-
 export SUBARCH=arm64
 
-# Configure
+# Use extracted config
 make bold_n2_defconfig
 
 # Build
 make -j$(nproc) Image.gz
 make -j$(nproc) dtbs
-make -j$(nproc) dtbo.img
-
-# Output will be:
-# arch/arm64/boot/Image.gz
-# arch/arm64/boot/dts/mediatek/*.dtb
+make -j$(nproc) modules
 ```
 
-### 4. Update Device Tree
+### Output Files
 
-After building, update the device tree BoardConfig.mk:
+- `arch/arm64/boot/Image.gz` - Kernel image
+- `arch/arm64/boot/dts/mediatek/mt6833-*.dtb` - Device tree
+- Modules in various subdirectories
 
-```makefile
-# Replace prebuilt kernel with source build
-TARGET_KERNEL_SOURCE := kernel/blu/bold_n2
-TARGET_KERNEL_CONFIG := bold_n2_defconfig
-BOARD_KERNEL_IMAGE_NAME := Image.gz
+## Kernel Command Line
 
-# Remove these lines:
-# TARGET_PREBUILT_KERNEL := $(LOCAL_PATH)/prebuilt-kernel/Image.gz
-# TARGET_PREBUILT_DTB := $(LOCAL_PATH)/prebuilt-kernel/dtb.img
+From boot.img:
+
+```
+console=tty0 console=ttyMT3,921600n1 root=/dev/ram 
+vmalloc=496M slub_max_order=0 slub_debug=O 
+bootopt=64S3,32N2,64N2 buildvariant=user
 ```
 
-## Kernel Features
+## Kernel Build Information
 
-Based on MediaTek MT6833 platform:
+Extracted from vmlinux:
 
-- **CPU**: Octa-core (2x Cortex-A76 @ 2.4GHz + 6x Cortex-A55 @ 2.0GHz)
+```
+Linux version 4.14.186 (nobody@android-build)
+(Android (6443078 based on r383902) clang version 11.0.1)
+#2 SMP PREEMPT Wed Sep 14 22:57:41 CST 2022
+```
+
+## Boot Image Parameters
+
+From unpacking boot.img:
+
+- **Base Address**: 0x40078000
+- **Page Size**: 2048 bytes
+- **Header Version**: 2
+- **OS Version**: 11.0.0
+- **OS Patch Level**: 2022-09
+- **DTB Included**: Yes (dtb.img)
+- **DTBO Included**: Yes (dtbo.img)
+
+## MediaTek Platform Notes
+
+The MT6833 (Dimensity 810) uses:
+
+- **CPU**: 2x Cortex-A76 @ 2.4GHz + 6x Cortex-A55 @ 2.0GHz
 - **GPU**: Mali-G57 MC2
-- **Memory**: LPDDR4X
-- **Storage**: UFS 2.1/2.2
-- **Display**: MIPI DSI
-- **Camera**: ISP with dual camera support
-- **Connectivity**: 5G modem, WiFi 6, Bluetooth 5.1
-- **Audio**: MediaTek audio codec
+- **Kernel Platform**: Shares platform code with MT6853 family
+- **PMIC**: MT6359P (power management IC)
+- **PMU**: MT6360 (battery/charging)
 
-## MediaTek-Specific Drivers
+## Directory Structure
 
-Required drivers for MT6833:
+```
+.
+├── README.md                          # This file
+├── BUILDING.md                        # Detailed build guide
+├── arch/arm64/configs/
+│   └── bold_n2_defconfig             # Real extracted kernel config (5512 lines)
+└── kernel_config_work/               # Config extraction documentation
+    ├── kernel_version.txt            # Kernel version info
+    ├── extraction_log.txt            # Extraction process log
+    └── config_candidates.txt         # Config hints
+```
 
-- `drivers/misc/mediatek/` - MediaTek platform drivers
-- Camera ISP drivers
-- GPU drivers (Mali)
-- Display drivers
-- Audio codec drivers
-- Thermal management
-- Power management (CPUFREQ, CPUIDLE)
-- Connectivity (WiFi, Bluetooth, GPS)
-- Sensors
+## Future Development
 
-## Kernel Patches
+### Short Term
+- Document all MediaTek-specific config options
+- Create optimized defconfig variants (debug, performance, battery)
+- Test kernel building when source becomes available
 
-Any device-specific patches should be documented here:
-
-1. **Boot optimization patches**
-2. **Hardware enablement patches**
-3. **Performance tuning patches**
-4. **Security patches**
-
-## Known Issues
-
-- Config extraction from prebuilt kernel failed (no IKCONFIG)
-- Kernel source not yet obtained
-- Building from source requires MediaTek kernel tree
-
-## References
-
-- [MediaTek Developer Resources](https://online.mediatek.com/)
-- [Linux Kernel Documentation](https://www.kernel.org/doc/)
-- [ARM64 Kernel Building](https://www.kernel.org/doc/html/latest/arm64/index.html)
+### Long Term
+- Obtain MediaTek MT6833 kernel source
+- Update to newer kernel version (5.x or 6.x)
+- Implement custom patches for LineageOS optimization
+- Mainline device tree improvements
 
 ## License
 
-The Linux kernel is licensed under GPL v2.
+The Linux kernel is released under the GNU GPL v2.
 
-## Contributing
+## References
 
-Contributions welcome! Please:
+- [Linux Kernel](https://www.kernel.org/)
+- [ARM64 Boot Protocol](https://www.kernel.org/doc/html/latest/arm64/booting.html)
+- [MediaTek Platform Documentation](https://online.mediatek.com/)
+- [Android Kernel Building](https://source.android.com/docs/setup/build/building-kernels)
 
-1. Document all changes
-2. Test on actual hardware
-3. Submit patches via pull request
+## Credits
 
-## Support
-
-For kernel-related issues:
-- Check device tree documentation
-- Review kernel logs: `dmesg`
-- Check boot logs: `adb shell dmesg | grep kernel`
+- Kernel configuration extracted from BLU Bold N2 stock firmware
+- Device tree and build system: LineageOS contributors
+- MediaTek platform support: MediaTek
 
 ---
 
-**Note**: This is a work in progress. Contributions to extract kernel config and build from source are welcome!
+**Note**: This kernel repository contains the complete, production kernel configuration extracted from the stock firmware. While we currently use a prebuilt kernel, this configuration enables future source-based kernel building when MediaTek source code becomes available.
