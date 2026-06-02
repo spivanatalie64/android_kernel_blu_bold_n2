@@ -174,3 +174,14 @@ The Linux kernel is released under the GNU GPL v2.
 ---
 
 **Note**: This kernel repository contains the complete, production kernel configuration extracted from the stock firmware. While we currently use a prebuilt kernel, this configuration enables future source-based kernel building when MediaTek source code becomes available.
+---
+
+## 🤖 Pullfrog AI Review
+
+This repository uses **Pullfrog AI** to automatically review pull requests.
+
+Pullfrog is an AI-powered code review agent that analyzes every PR for code quality,
+security issues, performance problems, and best practice violations. Reviews appear
+as inline PR comments and checks. Trigger manually by commenting `@pullfrog` on any PR.
+
+Powered by OpenRouter.
